@@ -1,22 +1,40 @@
 from fastapi import FastAPI
+from app.schemas.portfolio import PortfolioExecutionRequest
+from app.core.execution_engine import ExecutionEngine
+from app.notifications.notifier import Notifier
+
 from app.brokers.zerodha import ZerodhaBroker
-from app.execution.engine import ExecutionEngine
+from app.brokers.fyers import FyersBroker
+from app.brokers.angelone import AngelOneBroker
+from app.brokers.groww import GrowwBroker
+from app.brokers.upstox import UpstoxBroker
 
 app = FastAPI()
 
-@app.get("/")
-def home():
-    return {"message": "Kalpi Trade Engine Running"}
+
+def get_broker(broker_name: str):
+    brokers = {
+        "zerodha": ZerodhaBroker(),
+        "fyers": FyersBroker(),
+        "angelone": AngelOneBroker(),
+        "groww": GrowwBroker(),
+        "upstox": UpstoxBroker()
+    }
+    return brokers.get(broker_name.lower())
+
 
 @app.post("/execute")
-def execute_trades():
-    broker = ZerodhaBroker()
+def execute_portfolio(request: PortfolioExecutionRequest):
+
+    broker = get_broker(request.broker)
+
+    if not broker:
+        return {"error": "Unsupported broker"}
+
     engine = ExecutionEngine(broker)
+    results = engine.execute(request.trades)
 
-    target_portfolio = {
-        "RELIANCE": 10,
-        "INFY": 1
-    }
+    notifier = Notifier()
+    notifier.notify(results)
 
-    result = engine.execute(target_portfolio)
-    return {"orders": result}
+    return {"executed_trades": results}

@@ -1,17 +1,17 @@
 from app.brokers.base import BrokerInterface
 
 
-class ZerodhaBroker(BrokerInterface):
+class AngelOneBroker(BrokerInterface):
 
     def authenticate(self):
         return True
 
     def get_holdings(self):
-        return {"RELIANCE": 5, "INFY": 2}
+        return {}
 
     def place_order(self, symbol, quantity, side):
         return {
-            "broker": "Zerodha",
+            "broker": "AngelOne",
             "symbol": symbol,
             "quantity": quantity,
             "side": side,
