@@ -68,7 +68,8 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-Open API docs: (http://127.0.0.1:8001/docs)
+Open API docs: http://localhost:8000/docs
+
 
 
 
